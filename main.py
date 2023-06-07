@@ -2,7 +2,8 @@ import requests
 import datetime
 import random
 import json
-from tkinter import filedialog, dialog
+from tkinter import filedialog
+from tkinter.messagebox import askyesno, showinfo
 # Javascript to get onlyinfo
 # Array.from(document.querySelectorAll(".b-photos__item__img")).map(img => img?.src)
 # const d = new Set()
@@ -20,12 +21,15 @@ def save_image(image_content, dir, name):
 def main():
         # unique_urls = set(urls)
     # data_file = input("Introduzca la fuente de descarga (una lista json con los urls que desea)")
-    data_file = filedialog.askopenfile("r").name
-    print(f"Origen (Json): {data_file}")
-    data_file = open(data_file)
-    urls = json.load(data_file)
+    data_file = filedialog.askopenfile("r")
     result_dir = filedialog.askdirectory()
-    print(f"Resultado: {data_file}")
+    if not data_file or not result_dir: 
+        finished = askyesno("Los datos introducidos no son validos","¿Desea salir?")
+        if finished: return
+        return main()
+    showinfo("El resultado será", f"Origen (Json): {data_file}\n" + f"Resultado: {data_file}")
+    data_file = open(data_file.name)
+    urls = json.load(data_file)
 
     for url in urls:
         try:
@@ -35,7 +39,9 @@ def main():
         except: 
             print("Error")
 
-    print("Proceso completado")
-    dialog.Dialog()
+    repeat = askyesno("Proceso completado","¿Desea realizar otra descarga?")
+
+    if repeat: 
+        main()
 
 main()
